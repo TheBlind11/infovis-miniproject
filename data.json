@@ -1,0 +1,71 @@
+[
+    {
+        "legs": 20,
+        "arms": 100,
+        "head": 100,
+        "bust": 70
+    },
+    
+    {
+        "legs": 500,
+        "arms":300,
+        "head": 150,
+        "bust": 100
+    },
+    
+    {
+        "legs": 300,
+        "arms": 500,
+        "head": 90,
+        "bust": 45
+    },
+    
+    {
+        "legs": 50,
+        "arms": 450,
+        "head": 60,
+        "bust": 45
+    },
+    
+    {
+        "legs": 800,
+        "arms": 370,
+        "head": 40,
+        "bust": 60
+    },
+    
+    {
+        "legs": 600,
+        "arms": 60,
+        "head": 40,
+        "bust": 30
+    },
+    
+    {
+        "legs": 580,
+        "arms": 700,
+        "head": 100,
+        "bust": 80
+    },
+    
+    {
+        "legs": 750,
+        "arms": 650,
+        "head": 90,
+        "bust": 80
+    },
+    
+    {
+        "legs": 10,
+        "arms": 650,
+        "head": 75,
+        "bust": 30
+    },
+    
+    {
+        "legs": 300,
+        "arms": 250,
+        "head": 75,
+        "bust": 90
+    }
+]
