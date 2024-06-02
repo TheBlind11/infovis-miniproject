@@ -1,1 +1,1 @@
-# D3.js-miniproject
+# infovis-miniproject
