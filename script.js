@@ -90,18 +90,50 @@ function drawStickman(svg, x, y, stickman) {
 	drawLegs(svg, x, y, stickman);
 }
 
+function isOverlapping(x, y, stickmenPositions, radius) {
+    for (let pos of stickmenPositions) {
+        let dist = Math.sqrt(Math.pow(x - pos.x, 2) + Math.pow(y - pos.y, 2));
+        if (dist < 2 * radius) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function generateNonOverlappingPosition(stickmenPositions, width, height, radius) {
+    let x, y;
+    
+    do {
+        x = Math.random() * (width - 2 * radius - 40) + 20 + radius; // Adjusted for radius and padding
+        y = Math.random() * (height - 2 * radius - 100) + 50 + radius; // Adjusted for radius and padding
+    } while (isOverlapping(x, y, stickmenPositions, radius));
+    
+    return { x, y };
+}
+
 function fillBoard(svgBoard, data) {
-    data.forEach(function(d) {
-    	// Generate random positions within the SVG bounds
-    	let x = Math.random() * (svgBoard.attr("width") - 40) + 20; // 20 padding on each side
-    	console.log(svgBoard.width);
-    	let y = Math.random() * (svgBoard.attr("height") - 100) + 50; // 50 padding on top and bottom
-    	
-    	// Add default stroke properties to each stickman
+
+    const boardWidth = svgBoard.attr("width");
+    const boardHeight = svgBoard.attr("height");
+
+    const maxStickmanSize = d3.max(data, d => 
+        sizeScale(d.headRadius + d.bustLength + d.legLength)
+    );
+
+    const xPadding = maxStickmanSize / 2;
+    const baseYPosition = boardHeight - maxStickmanSize / 2; // Position the legs to touch the "ground"
+    const spacing = (boardWidth - 2 * xPadding) / (data.length - 1);
+    const yOffset = maxStickmanSize; // Adjust this value to move the stickmen up
+
+    data.forEach((d, i) => {
+        let x = xPadding + i * spacing;
+
+        d.id = i;
         d.strokeColor = 'black';
         d.strokeWidth = 2;
-        
-        // Draw the stickman at the random position
+
+        let y = baseYPosition - sizeScale(d.legLength) - sizeScale(d.bustLength) - sizeScale(d.headRadius) - yOffset;
+
         drawStickman(svgBoard, x, y, d);
     });
 }
@@ -112,8 +144,18 @@ d3.json("data.json")
         const boardWidth = Math.floor(0.8*window.screen.width);
 
         let svgBoard = d3.select("#svg-board");
-        svgBoard.attr("width", boardWidth);
-        svgBoard.attr("height", boardHeight);
+        svgBoard.attr("width", boardWidth)
+        	.attr("height", boardHeight)
+            .style("background-color", "lightgrey") // Add a background
+            .style("border", "2px solid black"); // Add border
+
+        // Aggiungiamo un rettangolo come sfondo per l'SVG
+        svgBoard.append("rect")
+            .attr("width", boardWidth)
+            .attr("height", boardHeight)
+            .attr("fill", "none")
+            .attr("stroke", "black")
+            .attr("stroke-width", 2);
 
         xScale.range([0, boardWidth]);
         yScale.range([boardHeight, 0]);
