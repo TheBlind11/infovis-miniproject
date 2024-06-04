@@ -24,63 +24,88 @@ sizeScale.domain([0, Math.min(xDomain[1], yDomain[1])]);
 function drawHead(svg, x, y, stickman) {
     // Draw the head
 	svg.append("circle")
+		.attr("id", stickman.id)
     	.attr("cx", x)
 	    .attr("cy", y)
 	    .attr("r", sizeScale(stickman.headRadius))
 	    .attr("stroke", stickman.strokeColor)
 	    .attr("stroke-width", stickman.strokeWidth)
-	    .attr("fill", "none");
+	    .style("pointer-events", "all") // Make the entire circle clickable
+	    .attr("fill", "none")
+	    .on("click", function() {
+            console.log('Head clicked');
+        });
 }
 
 function drawBust(svg, x, y, stickman) {
 	// Draw the body
 	svg.append("line")
+		.attr("id", stickman.id)
     	.attr("x1", x)
     	.attr("y1", y + sizeScale(stickman.headRadius))
     	.attr("x2", x)
     	.attr("y2", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength))
     	.attr("stroke", stickman.strokeColor)
-    	.attr("stroke-width", stickman.strokeWidth);
+    	.attr("stroke-width", stickman.strokeWidth)
+    	.on("click", function() {
+            console.log('Bust clicked');
+        });
 }
 
 function drawArms(svg, x, y, stickman) {
 	// Draw the left arm
 	svg.append("line")
+		.attr("id", stickman.id)
     	.attr("x1", x)
 	    .attr("y1", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength) / 4)
 	    .attr("x2", x - sizeScale(stickman.armLength) / 2)
 	    .attr("y2", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength) / 4 + sizeScale(stickman.armLength) / 2)
 	    .attr("stroke", stickman.strokeColor)
-	    .attr("stroke-width", stickman.strokeWidth);
+	    .attr("stroke-width", stickman.strokeWidth)
+	    .on("click", function() {
+            console.log('Left arm clicked');
+        });
 
 	// Draw the right arm
 	svg.append("line")
+		.attr("id", stickman.id)
 	    .attr("x1", x)
 	    .attr("y1", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength) / 4)
 	    .attr("x2", x + sizeScale(stickman.armLength) / 2)
 	    .attr("y2", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength) / 4 + sizeScale(stickman.armLength) / 2)
 	    .attr("stroke", stickman.strokeColor)
-	    .attr("stroke-width", stickman.strokeWidth);
+	    .attr("stroke-width", stickman.strokeWidth)
+	    .on("click", function() {
+            console.log('Right arm clicked');
+        });
 }
 
 function drawLegs(svg, x, y, stickman) {
 	// Draw the left leg
 	svg.append("line")
+		.attr("id", stickman.id)
 	    .attr("x1", x)
 	    .attr("y1", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength))
 	    .attr("x2", x - sizeScale(stickman.legLength) / 2)
 	    .attr("y2", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength) + sizeScale(stickman.legLength))
 	    .attr("stroke", stickman.strokeColor)
-	    .attr("stroke-width", stickman.strokeWidth);
+	    .attr("stroke-width", stickman.strokeWidth)
+	    .on("click", function() {
+            console.log('Left leg clicked');
+        });
 
 	// Draw the right leg
 	svg.append("line")
+		.attr("id", stickman.id)
 	    .attr("x1", x)
 	    .attr("y1", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength))
 	    .attr("x2", x + sizeScale(stickman.legLength) / 2)
 	    .attr("y2", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength) + sizeScale(stickman.legLength))
 	    .attr("stroke", stickman.strokeColor)
-	    .attr("stroke-width", stickman.strokeWidth);
+	    .attr("stroke-width", stickman.strokeWidth)
+	    .on("click", function() {
+            console.log('Right leg clicked');
+        });
 }
 
 function drawStickman(svg, x, y, stickman) {
@@ -88,27 +113,6 @@ function drawStickman(svg, x, y, stickman) {
 	drawBust(svg, x, y, stickman);
 	drawArms(svg, x, y, stickman);
 	drawLegs(svg, x, y, stickman);
-}
-
-function isOverlapping(x, y, stickmenPositions, radius) {
-    for (let pos of stickmenPositions) {
-        let dist = Math.sqrt(Math.pow(x - pos.x, 2) + Math.pow(y - pos.y, 2));
-        if (dist < 2 * radius) {
-            return true;
-        }
-    }
-    return false;
-}
-
-function generateNonOverlappingPosition(stickmenPositions, width, height, radius) {
-    let x, y;
-    
-    do {
-        x = Math.random() * (width - 2 * radius - 40) + 20 + radius; // Adjusted for radius and padding
-        y = Math.random() * (height - 2 * radius - 100) + 50 + radius; // Adjusted for radius and padding
-    } while (isOverlapping(x, y, stickmenPositions, radius));
-    
-    return { x, y };
 }
 
 function fillBoard(svgBoard, data) {
@@ -130,7 +134,7 @@ function fillBoard(svgBoard, data) {
 
         d.id = i;
         d.strokeColor = 'black';
-        d.strokeWidth = 2;
+        d.strokeWidth = 4;
 
         let y = baseYPosition - sizeScale(d.legLength) - sizeScale(d.bustLength) - sizeScale(d.headRadius) - yOffset;
 
