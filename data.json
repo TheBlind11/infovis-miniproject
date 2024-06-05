@@ -1,55 +1,55 @@
 [
     {
         "headRadius": 20,
-        "bustLength": 100,
-        "armLength": 100,
+        "bustLength": 10,
+        "armLength": 50,
         "legLength": 70
     },
     
     {
-        "headRadius": 50,
+        "headRadius": 40,
         "bustLength": 30,
-        "armLength": 15,
-        "legLength": 10
+        "armLength": 45,
+        "legLength": 20
     },
     
     {
         "headRadius": 30,
         "bustLength": 50,
-        "armLength": 90,
+        "armLength": 70,
         "legLength": 45
     },
     
     {
-        "headRadius": 50,
+        "headRadius": 35,
         "bustLength": 45,
         "armLength": 60,
         "legLength": 45    
     },
     
     {
-        "headRadius": 80,
+        "headRadius": 25,
         "bustLength": 37,
         "armLength": 40,
         "legLength": 60
     },
     
     {
-        "headRadius": 60,
+        "headRadius": 40,
         "bustLength": 60,
         "armLength": 40,
         "legLength": 30
     },
     
     {
-        "headRadius": 58,
+        "headRadius": 50,
         "bustLength": 70,
-        "armLength": 10,
+        "armLength": 30,
         "legLength": 80
     },
     
     {
-        "headRadius": 75,
+        "headRadius": 60,
         "bustLength": 65,
         "armLength": 90,
         "legLength": 80
