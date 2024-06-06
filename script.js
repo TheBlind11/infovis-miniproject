@@ -69,7 +69,7 @@ function drawArms(svg, x, y, stickman) {
 			.attr("stroke-width", stickman.strokeWidth)
 			.on("click", function() {
 				console.log('Arms clicked');
-				//sortStickmen('armLength');
+				sortStickmen('armLength');
 			});
 	});
 }
@@ -89,7 +89,7 @@ function drawLegs(svg, x, y, stickman) {
 			.attr("stroke-width", stickman.strokeWidth)
 			.on("click", function() {
 				console.log('Legs clicked');
-				//sortStickmen('legLength');
+				sortStickmen('legLength');
 			});
 	});
 }
