@@ -34,6 +34,7 @@ function drawHead(svg, x, y, stickman) {
 	    .attr("fill", "none")
 	    .on("click", function() {
             console.log('Head clicked');
+			sortStickmen('headRadius');
         });
 }
 
@@ -49,63 +50,48 @@ function drawBust(svg, x, y, stickman) {
     	.attr("stroke-width", stickman.strokeWidth)
     	.on("click", function() {
             console.log('Bust clicked');
+			sortStickmen('bustLength');
         });
 }
 
 function drawArms(svg, x, y, stickman) {
-	// Draw the left arm
-	svg.append("line")
-		.attr("id", stickman.id)
-    	.attr("x1", x)
-	    .attr("y1", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength) / 4)
-	    .attr("x2", x - sizeScale(stickman.armLength) / 2)
-	    .attr("y2", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength) / 4 + sizeScale(stickman.armLength) / 2)
-	    .attr("stroke", stickman.strokeColor)
-	    .attr("stroke-width", stickman.strokeWidth)
-	    .on("click", function() {
-            console.log('Left arm clicked');
-        });
+	// Draw both arms using a loop
+    const armOffsets = [-1, 1]; // Left arm and right arm multipliers for x position
 
-	// Draw the right arm
-	svg.append("line")
-		.attr("id", stickman.id)
-	    .attr("x1", x)
-	    .attr("y1", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength) / 4)
-	    .attr("x2", x + sizeScale(stickman.armLength) / 2)
-	    .attr("y2", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength) / 4 + sizeScale(stickman.armLength) / 2)
-	    .attr("stroke", stickman.strokeColor)
-	    .attr("stroke-width", stickman.strokeWidth)
-	    .on("click", function() {
-            console.log('Right arm clicked');
-        });
+	armOffsets.forEach(offset => {
+		svg.append("line")
+			.attr("id", stickman.id)
+			.attr("x1", x)
+			.attr("y1", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength) / 4)
+			.attr("x2", x + armOffsets * sizeScale(stickman.armLength) / 2)
+			.attr("y2", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength) / 4 + sizeScale(stickman.armLength) / 2)
+			.attr("stroke", stickman.strokeColor)
+			.attr("stroke-width", stickman.strokeWidth)
+			.on("click", function() {
+				console.log('Arms clicked');
+				sortStickmen('armLength');
+			});
+	});
 }
 
 function drawLegs(svg, x, y, stickman) {
-	// Draw the left leg
-	svg.append("line")
-		.attr("id", stickman.id)
-	    .attr("x1", x)
-	    .attr("y1", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength))
-	    .attr("x2", x - sizeScale(stickman.legLength) / 2)
-	    .attr("y2", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength) + sizeScale(stickman.legLength))
-	    .attr("stroke", stickman.strokeColor)
-	    .attr("stroke-width", stickman.strokeWidth)
-	    .on("click", function() {
-            console.log('Left leg clicked');
-        });
-
-	// Draw the right leg
-	svg.append("line")
-		.attr("id", stickman.id)
-	    .attr("x1", x)
-	    .attr("y1", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength))
-	    .attr("x2", x + sizeScale(stickman.legLength) / 2)
-	    .attr("y2", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength) + sizeScale(stickman.legLength))
-	    .attr("stroke", stickman.strokeColor)
-	    .attr("stroke-width", stickman.strokeWidth)
-	    .on("click", function() {
-            console.log('Right leg clicked');
-        });
+	// Draw both legs using a loop
+    const legOffsets = [-1, 1]; // Left leg and right leg multipliers for x position
+	
+	armOffsets.forEach(offset => {
+		svg.append("line")
+			.attr("id", stickman.id)
+			.attr("x1", x)
+			.attr("y1", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength))
+			.attr("x2", x + legOffsets * sizeScale(stickman.legLength) / 2)
+			.attr("y2", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength) + sizeScale(stickman.legLength))
+			.attr("stroke", stickman.strokeColor)
+			.attr("stroke-width", stickman.strokeWidth)
+			.on("click", function() {
+				console.log('Legs clicked');
+				sortStickmen('legLength');
+			});
+	});
 }
 
 function drawStickman(svg, x, y, stickman) {
@@ -113,6 +99,22 @@ function drawStickman(svg, x, y, stickman) {
 	drawBust(svg, x, y, stickman);
 	drawArms(svg, x, y, stickman);
 	drawLegs(svg, x, y, stickman);
+}
+
+function sortStickmen(attribute) {
+    d3.json("data.json")
+        .then(function(data) {
+            // Sort the stickmen data based on the specified attribute
+            data.sort((a, b) => a[attribute] - b[attribute]);
+
+            // Clear the existing stickmen
+            d3.selectAll("circle").remove();
+            d3.selectAll("line").remove();
+
+            // Re-render the stickmen in the sorted order
+            fillBoard(d3.select("#svg-board"), data);
+        })
+        .catch(error => console.log(error));
 }
 
 function fillBoard(svgBoard, data) {

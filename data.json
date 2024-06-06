@@ -1,7 +1,7 @@
 [
     {
         "headRadius": 20,
-        "bustLength": 10,
+        "bustLength": 35,
         "armLength": 50,
         "legLength": 70
     },
