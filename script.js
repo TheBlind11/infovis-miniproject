@@ -21,65 +21,65 @@ xScale.domain(xDomain);
 yScale.domain(yDomain);
 sizeScale.domain([0, Math.min(xDomain[1], yDomain[1])]);
 
-function drawHead(svg, x, y, stickman) {
+
+function drawHead(grp, x, y, stickman) {
     // Draw the head
-	svg.append("circle")
+	grp.append("circle")
 		.attr("class", "head")
-    	.attr("cx", x)
-	    .attr("cy", y)
-	    .attr("r", sizeScale(stickman.headRadius))
-	    .attr("stroke", stickman.strokeColor)
-	    .attr("stroke-width", stickman.strokeWidth)
-	    .style("pointer-events", "all") // Make the entire circle clickable
-	    .attr("fill", "none")
-	    .on("click", function() {
-            console.log('Head clicked');
-			//sortStickmen('headRadius');
-        });
+		.attr("stroke", stickman.strokeColor)
+		.attr("stroke-width", stickman.strokeWidth)
+		.attr("cx", x)
+		.attr("cy", y)
+		.attr("r", sizeScale(stickman.headRadius))
+		.style("pointer-events", "all") // Make the entire circle clickable
+		.attr("fill", "none")
+		.on("click", function() {
+			console.log('Head clicked');
+			sortStickmen('headRadius');
+		});
 }
 
-function drawBust(svg, x, y, stickman) {
+function drawBust(grp, x, y, stickman) {
 	// Draw the body
-	svg.append("line")
+	grp.append("line")
 		.attr("class", "bust")
-    	.attr("x1", x)
-    	.attr("y1", y + sizeScale(stickman.headRadius))
-    	.attr("x2", x)
-    	.attr("y2", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength))
-    	.attr("stroke", stickman.strokeColor)
-    	.attr("stroke-width", stickman.strokeWidth)
-    	.on("click", function() {
-            console.log('Bust clicked');
-			//sortStickmen('bustLength');
-        });
+		.attr("stroke", stickman.strokeColor)
+		.attr("stroke-width", stickman.strokeWidth)
+		.attr("x1", x)
+		.attr("y1", y + sizeScale(stickman.headRadius))
+		.attr("x2", x)
+		.attr("y2", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength))
+		.on("click", function() {
+			console.log('Bust clicked');
+			sortStickmen('bustLength');
+		});
 }
 
-function drawArms(svg, x, y, stickman) {
+function drawArms(grp, x, y, stickman) {
 	// Draw both arms using a loop
     const armOffsets = [-1, 1]; // Left arm and right arm multipliers for x position
-
-	armOffsets.forEach(offset => {
-		svg.append("line")
-			.attr("class", "arm")
-			.attr("x1", x)
-			.attr("y1", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength) / 4)
-			.attr("x2", x + offset * sizeScale(stickman.armLength) / 2)
-			.attr("y2", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength) / 4 + sizeScale(stickman.armLength) / 2)
-			.attr("stroke", stickman.strokeColor)
-			.attr("stroke-width", stickman.strokeWidth)
-			.on("click", function() {
-				console.log('Arms clicked');
-				//sortStickmen('armLength');
-			});
-	});
+		armOffsets.forEach(offset => {
+			grp.append("line")
+				.attr("class", "arm")
+				.attr("x1", x)
+				.attr("y1", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength) / 4)
+				.attr("x2", x + offset * sizeScale(stickman.armLength) / 2)
+				.attr("y2", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength) / 4 + sizeScale(stickman.armLength) / 2)
+				.attr("stroke", stickman.strokeColor)
+				.attr("stroke-width", stickman.strokeWidth)
+				.on("click", function() {
+					console.log('Arms clicked');
+					sortStickmen('armLength');
+				});
+		});
 }
 
-function drawLegs(svg, x, y, stickman) {
+function drawLegs(grp, x, y, stickman) {
 	// Draw both legs using a loop
     const legOffsets = [-1, 1]; // Left leg and right leg multipliers for x position
 	
 	legOffsets.forEach(offset => {
-		svg.append("line")
+		grp.append("line")
 			.attr("class", "leg")
 			.attr("x1", x)
 			.attr("y1", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength))
@@ -89,86 +89,95 @@ function drawLegs(svg, x, y, stickman) {
 			.attr("stroke-width", stickman.strokeWidth)
 			.on("click", function() {
 				console.log('Legs clicked');
-				//sortStickmen('legLength');
+				sortStickmen('legLength');
 			});
 	});
 }
 
-function drawStickman(svg, x, y, stickman) {
-	drawHead(svg, x, y, stickman);
-	drawBust(svg, x, y, stickman);
-	drawArms(svg, x, y, stickman);
-	drawLegs(svg, x, y, stickman);
+function drawStickman(grp, x, y, stickman) {
+	drawHead(grp, x, y, stickman);
+	drawBust(grp, x, y, stickman);
+	drawArms(grp, x, y, stickman);
+	drawLegs(grp, x, y, stickman);
 }
 
-/* function sortStickmen(data, attribute) {
+function updateHead(grp, x, y, stickman) {
+	let head = grp.select(".head");
+	head.transition()
+		.duration(5000)
+		.attr("cx", x)
+		.attr("cy", y)
+		.attr("r", sizeScale(stickman.headRadius));
+}
+
+function updateBust(grp, x, y, stickman) {
+	let bust = grp.select(".bust");
+	bust.transition()
+		.duration(5000)
+		.attr("x1", x)
+		.attr("y1", y + sizeScale(stickman.headRadius))
+		.attr("x2", x)
+		.attr("y2", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength));
+}
+
+function updateArms(grp, x, y, stickman) {
+	grp.selectAll(".arm")
+         .transition()
+         .duration(5000)
+         .attr("x1", x)
+         .attr("y1", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength) / 4)
+         .attr("x2", (d, i) => x + [-1, 1][i] * sizeScale(stickman.armLength) / 2)
+         .attr("y2", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength) / 4 + sizeScale(stickman.armLength) / 2);
+}
+
+function updateLegs(grp, x, y, stickman) {
+	grp.selectAll(".leg")
+         .transition()
+         .duration(5000)
+         .attr("x1", x)
+         .attr("y1", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength))
+         .attr("x2", (d, i) => x + [-1, 1][i] * sizeScale(stickman.legLength) / 2)
+         .attr("y2", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength) + sizeScale(stickman.legLength));
+}
+
+function updateStickman(grp, x, y, stickman) {
+	updateHead(grp, x, y, stickman);
+	updateBust(grp, x, y, stickman);
+	updateArms(grp, x, y, stickman);
+	updateLegs(grp, x, y, stickman);
+}
+
+function sortStickmen(attribute) {
 
     // Sort the stickmen data based on the specified attribute
-	data.sort((a, b) => a[attribute] - b[attribute]);
+	d3.json("data.json").then(function(data) {
+		data.sort((a, b) => a[attribute] - b[attribute]);
 
-    d3.selectAll(".stickman")
-		.data(data)
-		.each(function(d) {
-			drawStickman(d);
-			d3.select(this).select(".head")
-                .transition()
-                .duration(1000)
-                .attr("points", houseData.home)
-                .attr("data-case", d.homeWidth);
-		})
+		const svgBoard = d3.select("#svg-board");
+		const boardWidth = svgBoard.attr("width");
+    	const boardHeight = svgBoard.attr("height");
 
-            // Re-render the stickmen in the sorted order
-            fillBoard(d3.select("#svg-board"), data);
-        .catch(error => console.log(error));
-} */
+		const maxStickmanSize = d3.max(data, d => 
+			sizeScale(d.headRadius + d.bustLength + d.legLength)
+		);
 
-/* 
-function sortStickmen(attribute) {
-	d3.json("data.json")
-		.then(function(data) {
-			data.sort((a, b) => a[attribute] - b[attribute]);
+		const xPadding = maxStickmanSize / 2;
+		const baseYPosition = boardHeight - maxStickmanSize / 2; // Position the legs to touch the "ground"
+		const spacing = (boardWidth - 2 * xPadding) / (data.length - 1);
+		const yOffset = maxStickmanSize; // Adjust this value to move the stickmen up
+
+		d3.selectAll(".stickman")
+			.data(data)
+			.each(function(d, i) {
+				let x = xPadding + i * spacing;
 		
-			const stickmanY = parseFloat(yScale(yDomain[1] / 2));
-			const stickmanSpacing = (d3.select("#svg-board").attr("width") - 40) / data.length;
-		
-			data.forEach((d, i) => {
-				const x = parseFloat(xScale((i + 0.5) * stickmanSpacing));
-				const y = stickmanY;
-		
-				d3.selectAll("circle.head")
-					.transition()
-					.duration(1000)
-					.attr("cx", x);
-		
-				d3.selectAll("line.bust")
-					.transition()
-					.duration(1000)
-					.attr("x1", x)
-					.attr("x2", x);
-		
-				d3.selectAll("line.arm")
-					.transition()
-					.duration(1000)
-					.attr("x1", x)
-					.attr("x2", (d, i, nodes) => {
-						const offset = i % 2 === 0 ? -1 : 1;
-						return x + offset * sizeScale(data[Math.floor(i / 2)].armLength) * 0.5 / 2;
-					});
-		
-				d3.selectAll("line.leg")
-					.transition()
-					.duration(1000)
-					.attr("x1", x)
-					.attr("x2", (d, i, nodes) => {
-						const offset = i % 2 === 0 ? -1 : 1;
-						return x + offset * sizeScale(data[Math.floor(i / 2)].legLength) * 0.5 / 2;
-					});
+				let y = baseYPosition - sizeScale(d.legLength) - sizeScale(d.bustLength) - sizeScale(d.headRadius) - yOffset;
+				updateStickman(d3.select(this), x, y, d);
 			});
-		})
-		.catch(error => console.log(error));
-} */
+	})
+	.catch(error => console.log(error));
+}
 		
-
 function fillBoard(svgBoard, data) {
 
     const boardWidth = svgBoard.attr("width");
@@ -200,26 +209,12 @@ function fillBoard(svgBoard, data) {
 		let group = d3.select(this);
 		drawStickman(group, x, y, d);
 	})
-	
-	
-	/* data.forEach((d, i) => {
-        let x = xPadding + i * spacing;
-
-        d.strokeColor = 'black';
-        d.strokeWidth = 4;
-
-        let y = baseYPosition - sizeScale(d.legLength) - sizeScale(d.bustLength) - sizeScale(d.headRadius) - yOffset;
-
-        drawStickman(svgBoard, x, y, d);
-    }); */
-
-
 }
 
 d3.json("data.json")
     .then(function(data) {
-        const boardHeight = Math.floor(0.8*window.screen.height);
-        const boardWidth = Math.floor(0.8*window.screen.width);
+        const boardHeight = Math.floor(0.8 * window.screen.height);
+        const boardWidth = Math.floor(0.8 * window.screen.width);
 
         let svgBoard = d3.select("#svg-board");
         svgBoard.attr("width", boardWidth)
