@@ -30,8 +30,7 @@ The `data.json` file should contain an array of objects, each representing a dat
         "armLength": 40,
         "headRadius": 20,
         "bustLength": 60
-    },
-    ...
+    }
 ]
 ```
 
