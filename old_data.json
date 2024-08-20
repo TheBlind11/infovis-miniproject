@@ -1,6 +1,6 @@
 [
     {
-        "headRadius": 200,
+        "headRadius": 20,
         "bustLength": 35,
         "armLength": 50,
         "legLength": 70
@@ -8,7 +8,7 @@
     
     {
         "headRadius": 40,
-        "bustLength": 300,
+        "bustLength": 30,
         "armLength": 45,
         "legLength": 20
     },
@@ -16,7 +16,7 @@
     {
         "headRadius": 30,
         "bustLength": 50,
-        "armLength": 700,
+        "armLength": 70,
         "legLength": 45
     },
     

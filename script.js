@@ -11,16 +11,51 @@ delle variabili (che deve poter essere arbitrario) sull'intervallo dei valori de
 
 */
 
-let xScale = d3.scaleLinear();
-let yScale = d3.scaleLinear();
+const boardHeight = Math.floor(0.8 * window.screen.height);
+const boardWidth = Math.floor(0.8 * window.screen.width);
+
+let headRadiusScale = d3.scaleLinear();
+let bustLengthScale = d3.scaleLinear();
+let armLengthScale = d3.scaleLinear();
+let legLengthScale = d3.scaleLinear();
 let sizeScale = d3.scaleLinear();
 
-const xDomain = [0, 1000];
-const yDomain = [0, 800];
-xScale.domain(xDomain);
-yScale.domain(yDomain);
-sizeScale.domain([0, Math.min(xDomain[1], yDomain[1])]);
+function getMax(data) {
+	let maxHeadRadius = d3.max(data, function(element){ return element["headRadius"]; });
+	let maxBustLength = d3.max(data, function(element){ return element["bustLength"]; });
+	let maxArmLength = d3.max(data, function(element){ return element["armLength"]; });
+	let maxLegLength = d3.max(data, function(element){ return element["legLength"]; });
+	let maxSize = Math.max(maxHeadRadius, maxBustLength, maxArmLength, maxLegLength);
 
+	return { maxHeadRadius, maxBustLength, maxArmLength, maxLegLength, maxSize };
+}
+
+function computeScales(data) {
+
+	let { maxHeadRadius, maxBustLength, maxArmLength, maxLegLength, maxSize } = getMax(data);
+
+    // Adjust the scaling ranges to more reasonable values
+	headRadiusScale
+        .domain([0, maxHeadRadius])
+        .range([boardWidth * 0.01, boardWidth * 0.04]);
+
+    // Scaling bust length, arm length, leg length to fit within the height
+    bustLengthScale
+        .domain([0, maxBustLength])
+        .range([boardHeight * 0.05, boardHeight * 0.15]);
+
+    armLengthScale
+        .domain([0, maxArmLength])
+        .range([boardWidth * 0.05, boardHeight * 0.15]);
+
+    legLengthScale
+        .domain([0, maxLegLength])
+        .range([boardHeight * 0.05, boardHeight * 0.15]);
+	
+	sizeScale
+		.domain([0, maxSize])
+		.range([boardHeight * 0.05, boardHeight * 0.15]);
+}
 
 function drawHead(grp, x, y, stickman) {
     // Draw the head
@@ -30,7 +65,7 @@ function drawHead(grp, x, y, stickman) {
 		.attr("stroke-width", stickman.strokeWidth)
 		.attr("cx", x)
 		.attr("cy", y)
-		.attr("r", sizeScale(stickman.headRadius))
+		.attr("r", headRadiusScale(stickman.headRadius))
 		.style("pointer-events", "all") // Make the entire circle clickable
 		.attr("fill", "none")
 		.on("click", function() {
@@ -40,15 +75,19 @@ function drawHead(grp, x, y, stickman) {
 }
 
 function drawBust(grp, x, y, stickman) {
+
+	let headHeight = headRadiusScale(stickman.headRadius);
+    let bustHeight = bustLengthScale(stickman.bustLength);
+
 	// Draw the body
 	grp.append("line")
 		.attr("class", "bust")
 		.attr("stroke", stickman.strokeColor)
 		.attr("stroke-width", stickman.strokeWidth)
 		.attr("x1", x)
-		.attr("y1", y + sizeScale(stickman.headRadius))
+		.attr("y1", y + headHeight)
 		.attr("x2", x)
-		.attr("y2", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength))
+		.attr("y2", y + headHeight + bustHeight)
 		.on("click", function() {
 			console.log('Bust clicked');
 			sortStickmen('bustLength');
@@ -62,9 +101,9 @@ function drawArms(grp, x, y, stickman) {
 			grp.append("line")
 				.attr("class", "arm")
 				.attr("x1", x)
-				.attr("y1", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength) / 4)
-				.attr("x2", x + offset * sizeScale(stickman.armLength) / 2)
-				.attr("y2", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength) / 4 + sizeScale(stickman.armLength) / 2)
+				.attr("y1", y + headRadiusScale(stickman.headRadius) + bustLengthScale(stickman.bustLength) / 4)
+				.attr("x2", x + offset * armLengthScale(stickman.armLength) / 2)
+				.attr("y2", y + headRadiusScale(stickman.headRadius) + bustLengthScale(stickman.bustLength) / 4 + armLengthScale(stickman.armLength) / 2)
 				.attr("stroke", stickman.strokeColor)
 				.attr("stroke-width", stickman.strokeWidth)
 				.on("click", function() {
@@ -82,9 +121,9 @@ function drawLegs(grp, x, y, stickman) {
 		grp.append("line")
 			.attr("class", "leg")
 			.attr("x1", x)
-			.attr("y1", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength))
-			.attr("x2", x + offset * sizeScale(stickman.legLength) / 2)
-			.attr("y2", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength) + sizeScale(stickman.legLength))
+			.attr("y1", y + headRadiusScale(stickman.headRadius) + bustLengthScale(stickman.bustLength))
+			.attr("x2", x + offset * legLengthScale(stickman.legLength) / 2)
+			.attr("y2", y + headRadiusScale(stickman.headRadius) + bustLengthScale(stickman.bustLength) + legLengthScale(stickman.legLength))
 			.attr("stroke", stickman.strokeColor)
 			.attr("stroke-width", stickman.strokeWidth)
 			.on("click", function() {
@@ -107,7 +146,7 @@ function updateHead(grp, x, y, stickman) {
 		.duration(5000)
 		.attr("cx", x)
 		.attr("cy", y)
-		.attr("r", sizeScale(stickman.headRadius));
+		.attr("r", headRadiusScale(stickman.headRadius));
 }
 
 function updateBust(grp, x, y, stickman) {
@@ -115,9 +154,9 @@ function updateBust(grp, x, y, stickman) {
 	bust.transition()
 		.duration(5000)
 		.attr("x1", x)
-		.attr("y1", y + sizeScale(stickman.headRadius))
+		.attr("y1", y + headRadiusScale(stickman.headRadius))
 		.attr("x2", x)
-		.attr("y2", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength));
+		.attr("y2", y + headRadiusScale(stickman.headRadius) + bustLengthScale(stickman.bustLength));
 }
 
 function updateArms(grp, x, y, stickman) {
@@ -125,9 +164,9 @@ function updateArms(grp, x, y, stickman) {
          .transition()
          .duration(5000)
          .attr("x1", x)
-         .attr("y1", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength) / 4)
-         .attr("x2", (d, i) => x + [-1, 1][i] * sizeScale(stickman.armLength) / 2)
-         .attr("y2", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength) / 4 + sizeScale(stickman.armLength) / 2);
+         .attr("y1", y + headRadiusScale(stickman.headRadius) + bustLengthScale(stickman.bustLength) / 4)
+         .attr("x2", (d, i) => x + [-1, 1][i] * armLengthScale(stickman.armLength) / 2)
+         .attr("y2", y + headRadiusScale(stickman.headRadius) + bustLengthScale(stickman.bustLength) / 4 + armLengthScale(stickman.armLength) / 2);
 }
 
 function updateLegs(grp, x, y, stickman) {
@@ -135,9 +174,9 @@ function updateLegs(grp, x, y, stickman) {
          .transition()
          .duration(5000)
          .attr("x1", x)
-         .attr("y1", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength))
-         .attr("x2", (d, i) => x + [-1, 1][i] * sizeScale(stickman.legLength) / 2)
-         .attr("y2", y + sizeScale(stickman.headRadius) + sizeScale(stickman.bustLength) + sizeScale(stickman.legLength));
+         .attr("y1", y + headRadiusScale(stickman.headRadius) + bustLengthScale(stickman.bustLength))
+         .attr("x2", (d, i) => x + [-1, 1][i] * legLengthScale(stickman.legLength) / 2)
+         .attr("y2", y + headRadiusScale(stickman.headRadius) + bustLengthScale(stickman.bustLength) + legLengthScale(stickman.legLength));
 }
 
 function updateStickman(grp, x, y, stickman) {
@@ -157,21 +196,18 @@ function sortStickmen(attribute) {
 		const boardWidth = svgBoard.attr("width");
     	const boardHeight = svgBoard.attr("height");
 
-		const maxStickmanSize = d3.max(data, d => 
-			sizeScale(d.headRadius + d.bustLength + d.legLength)
-		);
-
-		const xPadding = maxStickmanSize / 2;
-		const baseYPosition = boardHeight - maxStickmanSize / 2; // Position the legs to touch the "ground"
+		let { maxSize } = getMax(data);
+		const xPadding = sizeScale(maxSize);
+		const baseYPosition = boardHeight - sizeScale(maxSize) / 2; // Position the legs to touch the "ground"
 		const spacing = (boardWidth - 2 * xPadding) / (data.length - 1);
-		const yOffset = maxStickmanSize; // Adjust this value to move the stickmen up
+		const yOffset = sizeScale(maxSize); // Adjust this value to move the stickmen up
 
 		d3.selectAll(".stickman")
 			.data(data)
 			.each(function(d, i) {
 				let x = xPadding + i * spacing;
 		
-				let y = baseYPosition - sizeScale(d.legLength) - sizeScale(d.bustLength) - sizeScale(d.headRadius) - yOffset;
+				let y = baseYPosition - legLengthScale(d.legLength) - bustLengthScale(d.bustLength) - headRadiusScale(d.headRadius) - yOffset;
 				updateStickman(d3.select(this), x, y, d);
 			});
 	})
@@ -182,15 +218,12 @@ function fillBoard(svgBoard, data) {
 
     const boardWidth = svgBoard.attr("width");
     const boardHeight = svgBoard.attr("height");
-
-    const maxStickmanSize = d3.max(data, d => 
-        sizeScale(d.headRadius + d.bustLength + d.legLength)
-    );
-
-    const xPadding = maxStickmanSize / 2;
-    const baseYPosition = boardHeight - maxStickmanSize / 2; // Position the legs to touch the "ground"
+    
+	let { maxSize } = getMax(data);
+    const xPadding = sizeScale(maxSize);
+    const baseYPosition = boardHeight - sizeScale(maxSize) / 2; // Position the legs to touch the "ground"
     const spacing = (boardWidth - 2 * xPadding) / (data.length - 1);
-    const yOffset = maxStickmanSize; // Adjust this value to move the stickmen up
+    const yOffset = sizeScale(maxSize); // Adjust this value to move the stickmen up
 
     let stickmen = svgBoard.selectAll(".stickman")
         .data(data)
@@ -204,7 +237,7 @@ function fillBoard(svgBoard, data) {
 		d.strokeColor = 'black';
         d.strokeWidth = 4;
 
-        let y = baseYPosition - sizeScale(d.legLength) - sizeScale(d.bustLength) - sizeScale(d.headRadius) - yOffset;
+        let y = baseYPosition - legLengthScale(d.legLength) - bustLengthScale(d.bustLength) - headRadiusScale(d.headRadius) - yOffset;
 		
 		let group = d3.select(this);
 		drawStickman(group, x, y, d);
@@ -213,8 +246,7 @@ function fillBoard(svgBoard, data) {
 
 d3.json("data.json")
     .then(function(data) {
-        const boardHeight = Math.floor(0.8 * window.screen.height);
-        const boardWidth = Math.floor(0.8 * window.screen.width);
+    	computeScales(data);
 
         let svgBoard = d3.select("#svg-board");
         svgBoard.attr("width", boardWidth)
@@ -229,10 +261,6 @@ d3.json("data.json")
             .attr("fill", "none")
             .attr("stroke", "black")
             .attr("stroke-width", 2);
-
-        xScale.range([0, boardWidth]);
-        yScale.range([boardHeight, 0]);
-        sizeScale.range([0, Math.min(xDomain[1], yDomain[1])]);
 
         fillBoard(svgBoard, data);
     })
